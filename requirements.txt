@@ -2,4 +2,4 @@ ansible-core>=2.14.0
 ansible-runner
 requests
 netaddr
-ansible-pylibssh>=0.2.0
+ansible-pylibssh==1.2.2
