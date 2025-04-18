@@ -2,7 +2,6 @@ ARG EE_BASE_IMAGE="registry.redhat.io/ansible-automation-platform-21/ee-minimal-
 ARG EE_BUILDER_IMAGE="registry.redhat.io/ansible-automation-platform-21/ansible-builder-rhel8:1.0.1-28"
 ARG PYCMD="/usr/bin/python3"
 ARG PKGMGR_PRESERVE_CACHE=""
-ARG ANSIBLE_GALAXY_CLI_COLLECTION_OPTS="-cv"
 ARG ANSIBLE_GALAXY_CLI_ROLE_OPTS=""
 
 # Base build stage
@@ -13,7 +12,6 @@ ARG EE_BASE_IMAGE
 ARG EE_BUILDER_IMAGE
 ARG PYCMD
 ARG PKGMGR_PRESERVE_CACHE
-ARG ANSIBLE_GALAXY_CLI_COLLECTION_OPTS
 ARG ANSIBLE_GALAXY_CLI_ROLE_OPTS
 
 COPY _build/scripts/ /output/scripts/
@@ -25,7 +23,6 @@ ARG EE_BASE_IMAGE
 ARG EE_BUILDER_IMAGE
 ARG PYCMD
 ARG PKGMGR_PRESERVE_CACHE
-ARG ANSIBLE_GALAXY_CLI_COLLECTION_OPTS
 ARG ANSIBLE_GALAXY_CLI_ROLE_OPTS
 
 RUN /output/scripts/check_galaxy
@@ -36,7 +33,8 @@ WORKDIR /build
 
 RUN mkdir -p /usr/share/ansible
 RUN ansible-galaxy role install $ANSIBLE_GALAXY_CLI_ROLE_OPTS -r requirements.yml --roles-path "/usr/share/ansible/roles"
-RUN ANSIBLE_GALAXY_DISABLE_GPG_VERIFY=1 ansible-galaxy collection install $ANSIBLE_GALAXY_CLI_COLLECTION_OPTS -r requirements.yml --collections-path "/usr/share/ansible/collections"
+RUN ANSIBLE_GALAXY_DISABLE_GPG_VERIFY=True \
+    ansible-galaxy collection install -r requirements.yml --collections-path /usr/share/ansible/collections
 
 # Builder build stage
 FROM $EE_BUILDER_IMAGE as builder
@@ -46,8 +44,6 @@ ARG EE_BASE_IMAGE
 ARG EE_BUILDER_IMAGE
 ARG PYCMD
 ARG PKGMGR_PRESERVE_CACHE
-ARG ANSIBLE_GALAXY_CLI_COLLECTION_OPTS
-ARG ANSIBLE_GALAXY_CLI_ROLE_OPTS
 
 COPY _build/scripts/pip_install /output/scripts/pip_install
 RUN /output/scripts/pip_install $PYCMD
@@ -66,14 +62,11 @@ ARG EE_BASE_IMAGE
 ARG EE_BUILDER_IMAGE
 ARG PYCMD
 ARG PKGMGR_PRESERVE_CACHE
-ARG ANSIBLE_GALAXY_CLI_COLLECTION_OPTS
-ARG ANSIBLE_GALAXY_CLI_ROLE_OPTS
 
 RUN whoami
 RUN cat /etc/os-release
 
 COPY --from=galaxy /usr/share/ansible /usr/share/ansible
-
 COPY --from=builder /output/ /output/
 RUN /output/scripts/install-from-bindep && rm -rf /output/wheels
 RUN echo This is a post-install command!
