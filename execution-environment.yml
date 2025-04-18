@@ -10,15 +10,14 @@ dependencies:
     - ansible-runner
     - requests
     - netaddr
-    # This will be overridden via pip below to install from correct index
-    - ansible-pylibssh==1.2.2
+    - ansible-pylibssh==1.2.2  # optional, but safe to keep
 
   system: bindep.txt
 
 additional_build_steps:
   prepend_final:
-    - RUN microdnf install -y dnf && rm -rf /var/cache
-    - RUN pip install --extra-index-url=https://ansible.github.io/pylibssh/simple/ --pre ansible-pylibssh==1.2.2
+    - RUN microdnf install -y dnf python3-pip && rm -rf /var/cache
+    - RUN pip3 install --extra-index-url=https://ansible.github.io/pylibssh/simple/ --pre ansible-pylibssh==1.2.2
 
 options:
   package_manager_path: /usr/bin/microdnf
