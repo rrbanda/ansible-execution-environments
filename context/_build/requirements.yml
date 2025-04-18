@@ -1,4 +1,5 @@
 ---
 collections:
   - name: community.general
-    source: https://galaxy.ansible.com
+    version: "7.0.1"
+
