@@ -1,22 +1,22 @@
----
-version: 1
+version: 3
 
-build_arg_defaults:
-  EE_BASE_IMAGE: 'registry.redhat.io/ansible-automation-platform-21/ee-minimal-rhel8:1.0.0-48'
-  EE_BUILDER_IMAGE: 'registry.redhat.io/ansible-automation-platform-21/ansible-builder-rhel8:1.0.1-28'
-  ANSIBLE_GALAXY_CLI_COLLECTION_OPTS: '-cv'
-
-ansible_config: './ansible.cfg'
+images:
+  base_image:
+    name: registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel8:latest
 
 dependencies:
-  galaxy: ./requirements.yml
-  python: ./requirements.txt
-  system: ./bindep.txt
+  python:
+    - ansible-core>=2.14.0
+    - ansible-runner
+    - requests
+    - netaddr
+    - ansible-pylibssh>=0.2.0
+
+  system: bindep.txt
 
 additional_build_steps:
-  prepend: |
-    RUN whoami
-    RUN cat /etc/os-release
-  append:
-    - RUN echo This is a post-install command!
-    - RUN ls -la /etc
+  prepend_final:
+    - RUN microdnf install -y dnf && rm -rf /var/cache
+
+options:
+  package_manager_path: /usr/bin/microdnf

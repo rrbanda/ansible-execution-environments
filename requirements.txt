@@ -1,2 +1,4 @@
-ansible-lint
-yamllint
+ansible-core>=2.14.0
+ansible-runner
+requests
+netaddr
