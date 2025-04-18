@@ -10,7 +10,7 @@ dependencies:
     - ansible-runner
     - requests
     - netaddr
-    - ansible-pylibssh>=0.2.0
+    - ansible-pylibssh==1.2.2
 
   system: bindep.txt
 
